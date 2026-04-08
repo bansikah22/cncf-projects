@@ -2,7 +2,7 @@
 
 ## Architecture
 
-`containerd` is a high-level container runtime that acts as a robust, daemon-based abstraction layer between container orchestration systems (like Kubernetes) and low-level runtimes (like `runc`). It manages the complete container lifecycle, from image transfer and storage to container execution, supervision, and networking.
+[`containerd`](https://containerd.io/) is a high-level container runtime that acts as a robust, daemon-based abstraction layer between container orchestration systems (like Kubernetes) and low-level runtimes (like `runc`). It manages the complete container lifecycle, from image transfer and storage to container execution, supervision, and networking.
 
 Its architecture is built on a few key components:
 

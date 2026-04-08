@@ -2,7 +2,7 @@
 
 ## Architecture
 
-CoreDNS is a flexible and extensible DNS server written in Go. Its power comes from its plugin-based architecture. Each plugin performs a specific DNS function, and they are chained together to process DNS queries. This allows for a highly customizable DNS server that can be tailored to specific needs.
+[`CoreDNS`](https://coredns.io/) is a flexible and extensible DNS server written in Go. Its power comes from its plugin-based architecture. Each plugin performs a specific DNS function, and they are chained together to process DNS queries. This allows for a highly customizable DNS server that can be tailored to specific needs.
 
 Here is a diagram illustrating the plugin chain concept:
 

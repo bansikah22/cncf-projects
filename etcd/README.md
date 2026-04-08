@@ -2,7 +2,7 @@
 
 ## Architecture
 
-etcd is a distributed key-value store that uses the [Raft consensus algorithm](https://raft.github.io/) to manage a highly-available replicated log. This ensures strong consistency across all nodes in a cluster.
+[`etcd`](https://etcd.io/) is a distributed key-value store that uses the [Raft consensus algorithm](https://raft.github.io/) to manage a highly-available replicated log. This ensures strong consistency across all nodes in a cluster.
 
 When a client sends a write request to the leader, the leader forwards the request to its followers. The write is committed only after a majority of the nodes in the cluster have acknowledged it. This process ensures that the data is safely replicated and the system can tolerate failures of a minority of nodes.
 
