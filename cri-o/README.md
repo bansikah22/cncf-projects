@@ -29,15 +29,33 @@ graph TD
 
 ## Verifiable Demo with Minikube
 
-The most effective way to see CRI-O in action is to run a local Kubernetes cluster configured to use it as the container runtime. The success of this demo is determined by verifying that the Kubernetes node is in fact using CRI-O.
+The most effective way to see CRI-O in action is to run a local Kubernetes cluster configured to use it as the container runtime. The `demo.sh` script automates the following steps, with the success of the demo being determined by verifying that the Kubernetes node is in fact using CRI-O.
 
-This demo uses `minikube` to:
-1.  Start a Kubernetes cluster, specifying `cri-o` as the container runtime.
-2.  Inspect the node's status to confirm that its `containerRuntimeVersion` is `cri-o`. This is the primary verification step.
-3.  Attempt to deploy a simple NGINX pod to show the runtime in action.
-4.  Clean up the cluster.
+### 1. Start a Minikube Cluster with CRI-O
+This command starts a new Kubernetes cluster, instructing `minikube` to use CRI-O as the container runtime instead of the default.
+```bash
+minikube start --driver=docker --container-runtime=cri-o
+```
 
-**Note**: In some environments, the final NGINX pod may fail to pull its image with an `ImageInspectError`. This is a known issue related to how `minikube` provisions networking or storage for CRI-O in certain contexts. However, the main goal—proving CRI-O is the active runtime—is still achieved.
+### 2. Verify the Container Runtime
+This is the key verification step. We use `kubectl` to inspect the node's properties and confirm the runtime is `cri-o`.
+```bash
+kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo.containerRuntimeVersion}'
+```
+Expected output will contain `cri-o://...`.
+
+### 3. Deploy a Simple NGINX Pod
+To show the runtime in action, we deploy a standard NGINX container.
+```bash
+kubectl create deployment nginx --image=nginx
+```
+**Note**: In some environments, this pod may fail to pull its image with an `ImageInspectError`. This is a known issue with `minikube`'s CRI-O provisioning in some contexts. However, the main goal—proving CRI-O is the active runtime—is still achieved in step 2.
+
+### 4. Clean Up the Cluster
+This command deletes the cluster and frees up the resources.
+```bash
+minikube delete
+```
 
 ### Prerequisites
 *   [minikube](https://minikube.sigs.k8s.io/docs/start/)
