@@ -17,39 +17,40 @@ Its architecture is built on a few key components:
 ```mermaid
 graph TD
     subgraph Clients
-        A[Kubernetes (kubelet)]
-        B[Docker Engine]
-        C[ctr client]
+        A["Kubernetes (kubelet)"]
+        B["Docker Engine"]
+        C["ctr client"]
     end
 
     subgraph containerd Daemon
-        D[gRPC API]
-        E[CRI Plugin]
-        F[Subsystems: Image, Metadata, Snapshot]
-        G[Task Service]
+        D["gRPC API"]
+        E["CRI Plugin"]
+        F["Subsystems: Image, Metadata, Snapshot"]
+        G["Task Service"]
     end
 
     subgraph "Per-Container Shims"
-        H[containerd-shim]
-        I[containerd-shim]
+        H["containerd-shim"]
+        I["containerd-shim"]
     end
 
     subgraph "Low-Level Runtimes"
-        J[runc]
-        K[runc]
+        J["runc"]
+        K["runc"]
     end
 
-    A --> E --> D;
-    B --> D;
-    C --> D;
-    D --> F;
-    D --> G;
+    A --> E
+    E --> D
+    B --> D
+    C --> D
+    D --> F
+    D --> G
 
-    G --> H;
-    G --> I;
+    G --> H
+    G --> I
 
-    H --> J;
-    I --> K;
+    H --> J
+    I --> K
 ```
 
 ## Use Cases
