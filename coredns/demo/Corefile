@@ -1,0 +1,7 @@
+.:53 {
+    hosts {
+        127.0.0.1 example.com
+    }
+    forward . 8.8.8.8
+    log
+}
