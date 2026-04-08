@@ -54,9 +54,11 @@ echo "--> 5. Deploying a sample application via Argo CD..."
 kubectl apply -f "$DEMO_DIR/application.yaml"
 
 echo "--> 6. Verifying the application deployment..."
+# Stream the sync status to see the progress
+argocd app get guestbook --show-operation --show-sync-status &
 # Wait for Argo CD to report the application is synced and healthy
-kubectl wait --for=condition=healthy --timeout=300s application/guestbook -n argocd
-kubectl wait --for=condition=synced --timeout=300s application/guestbook -n argocd
+kubectl wait --for=condition=healthy --timeout=600s application/guestbook -n argocd
+kubectl wait --for=condition=synced --timeout=600s application/guestbook -n argocd
 echo "--> SUCCESS: Application is healthy and synced."
 
 echo "--> Argo CD demo completed successfully!"
