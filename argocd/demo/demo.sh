@@ -69,6 +69,8 @@ ARGOCD_PORT_FORWARD_PID=$!
 sleep 5
 # Login using the password
 argocd login localhost:8080 --username admin --password "$ARGOCD_PASSWORD" --insecure
+# Kill the port-forwarding process now that we are logged in
+kill "$ARGOCD_PORT_FORWARD_PID"
 
 echo "--> 6. Deploying guestbook app using local Kustomize config (2 replicas)..."
 kubectl apply -f "$DEMO_DIR/application.yaml"

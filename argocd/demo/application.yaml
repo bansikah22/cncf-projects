@@ -6,8 +6,6 @@ metadata:
 spec:
   project: default
   source:
-    # This is now pointing to a path within our repo instead of a remote git repo.
-    # Argo CD will use the files from the local filesystem of the repo-server.
     repoURL: https://github.com/bansikah22/cncf-projects.git
     targetRevision: HEAD
     path: argocd/demo/guestbook-gitops/overlays/staging
