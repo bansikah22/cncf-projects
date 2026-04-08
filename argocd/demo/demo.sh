@@ -47,25 +47,13 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2
 echo "--> 4. Waiting for Argo CD to be ready..."
 kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd
 
-echo "--> 5. Deploying a sample application..."
-# In a real scenario, you would create an Application resource.
-# For simplicity, we'll just apply a manifest directly.
-kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Pod
-metadata:
-  name: guestbook-ui
-  labels:
-    app: guestbook-ui
-spec:
-  containers:
-  - name: guestbook-ui
-    image: gcr.io/heptio-images/ks-guestbook-demo:0.2
-    ports:
-    - containerPort: 80
-EOF
+echo "--> 5. Deploying a sample application via Argo CD..."
+kubectl apply -f "$DEMO_DIR/application.yaml"
 
 echo "--> 6. Verifying the application deployment..."
-kubectl wait --for=condition=ready --timeout=120s pod/guestbook-ui
+# Wait for Argo CD to report the application is synced and healthy
+kubectl wait --for=condition=healthy --timeout=300s application/guestbook -n argocd
+kubectl wait --for=condition=synced --timeout=300s application/guestbook -n argocd
+echo "--> SUCCESS: Application is healthy and synced."
 
 echo "--> Argo CD demo completed successfully!"
