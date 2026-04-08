@@ -17,4 +17,4 @@ sleep 1
 docker exec etcd-demo etcdctl put mykey "this is a new value"
 sleep 1
 # Kill the watch process
-kill $WATCH_PID
+kill $WATCH_PID 2>/dev/null || true
