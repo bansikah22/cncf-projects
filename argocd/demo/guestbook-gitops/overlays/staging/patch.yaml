@@ -1,0 +1,7 @@
+# guestbook-gitops/overlays/staging/patch.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-ui
+spec:
+  replicas: 2

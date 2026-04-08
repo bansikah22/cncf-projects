@@ -6,9 +6,11 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    # This is now pointing to a path within our repo instead of a remote git repo.
+    # Argo CD will use the files from the local filesystem of the repo-server.
+    repoURL: https://github.com/bansikah22/cncf-projects.git
     targetRevision: HEAD
-    path: guestbook
+    path: argocd/demo/guestbook-gitops/overlays/staging
   destination:
     server: https://kubernetes.default.svc
     namespace: guestbook
