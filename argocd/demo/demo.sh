@@ -46,6 +46,9 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2
 
 echo "--> 4. Waiting for Argo CD to be ready..."
 kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd
+echo "--> Argo CD server is available. Waiting for CRDs to be established..."
+kubectl wait --for condition=established --timeout=60s crd/applications.argoproj.io
+sleep 15
 
 echo "--> 5. Deploying a sample application via Argo CD..."
 kubectl apply -f "$DEMO_DIR/application.yaml"
