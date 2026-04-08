@@ -38,6 +38,10 @@ TEMP_CONFIG_PATH="$DEMO_DIR/collector-config-temp.yaml"
 # Use a different sed delimiter (#) to avoid issues with special characters in variables
 sed "s#jaeger:4317#${JAEGER_IP}:4317#g" "$CONFIG_TEMPLATE_PATH" > "$TEMP_CONFIG_PATH"
 
+echo "--> Verifying temporary collector config:"
+cat "$TEMP_CONFIG_PATH"
+echo "---"
+
 docker run -d --name otel-collector --network $NETWORK_NAME \
   -v "$(pwd)/$TEMP_CONFIG_PATH:/etc/otelcol/config.yaml" \
   -p 13133:13133 \
