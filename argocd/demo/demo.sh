@@ -12,6 +12,10 @@ KUSTOMIZE_PATCH_FILE="$DEMO_DIR/guestbook-gitops/overlays/staging/patch.yaml"
 # Cleanup function
 cleanup() {
   echo "--> Cleaning up..."
+  # Kill the port-forwarding process if it's running
+  if [ -n "$ARGOCD_PORT_FORWARD_PID" ]; then
+    kill "$ARGOCD_PORT_FORWARD_PID"
+  fi
   # Restore the original patch file to avoid committing the change
   git checkout -- "$KUSTOMIZE_PATCH_FILE"
   minikube delete --profile argocd-demo || true
@@ -55,15 +59,26 @@ echo "--> Argo CD server is available. Waiting for CRDs to be established..."
 kubectl wait --for condition=established --timeout=60s crd/applications.argoproj.io
 sleep 15
 
-echo "--> 5. Deploying guestbook app using local Kustomize config (2 replicas)..."
+echo "--> 5. Authenticating with Argo CD..."
+# Get the auto-generated admin password
+ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+# Port-forward the Argo CD server to localhost
+kubectl -n argocd port-forward svc/argocd-server 8080:443 &
+ARGOCD_PORT_FORWARD_PID=$!
+# Wait a moment for the port-forward to be ready
+sleep 5
+# Login using the password
+argocd login localhost:8080 --username admin --password "$ARGOCD_PASSWORD" --insecure
+
+echo "--> 6. Deploying guestbook app using local Kustomize config (2 replicas)..."
 kubectl apply -f "$DEMO_DIR/application.yaml"
 
-echo "--> 6. Verifying the application syncs and is healthy..."
+echo "--> 7. Verifying the application syncs and is healthy..."
 # This command is a bit more robust for waiting on sync status
 argocd app wait guestbook --sync --health --timeout 300
 echo "--> SUCCESS: Application has synced successfully."
 
-echo "--> 7. Verifying the deployment has the correct initial replica count (2)..."
+echo "--> 8. Verifying the deployment has the correct initial replica count (2)..."
 REPLICAS=$(kubectl get deployment -n guestbook guestbook-ui -o jsonpath='{.spec.replicas}')
 if [ "$REPLICAS" -ne 2 ]; then
   echo "--> FAILURE: Expected 2 replicas but found $REPLICAS."
@@ -71,7 +86,7 @@ if [ "$REPLICAS" -ne 2 ]; then
 fi
 echo "--> SUCCESS: Deployment has 2 replicas, as defined in the staging overlay."
 
-echo "--> 8. Simulating a Git change: updating replica count to 3..."
+echo "--> 9. Simulating a Git change: updating replica count to 3..."
 sed -i 's/replicas: 2/replicas: 3/' "$KUSTOMIZE_PATCH_FILE"
 echo "--> Change applied to $KUSTOMIZE_PATCH_FILE. Argo CD will now detect and sync this change."
 
@@ -84,7 +99,7 @@ echo "--> Waiting for the application to re-sync with the new configuration..."
 argocd app wait guestbook --sync --health --timeout 300
 echo "--> SUCCESS: Application has re-synced successfully."
 
-echo "--> 9. Verifying the deployment has been scaled to 3 replicas..."
+echo "--> 10. Verifying the deployment has been scaled to 3 replicas..."
 REPLICAS=$(kubectl get deployment -n guestbook guestbook-ui -o jsonpath='{.spec.replicas}')
 if [ "$REPLICAS" -ne 3 ]; then
   echo "--> FAILURE: Expected 3 replicas after sync but found $REPLICAS."
