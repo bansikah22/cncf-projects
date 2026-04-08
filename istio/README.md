@@ -45,133 +45,34 @@ By controlling all the proxies from a central place, Istio can provide powerful 
 *   **Observability:** It automatically generates detailed metrics, logs, and traces for all traffic, giving you a complete picture of how your services are communicating.
 *   **Traffic Management:** You can easily implement advanced routing rules, like canary deployments (sending 10% of traffic to a new version), A/B testing, or automatic retries and circuit breakers.
 
-## Conceptual Demo: A Canary Deployment
+## Verifiable Demo: A Canary Deployment
+This demo is a runnable script that uses `minikube` to showcase a real-world Istio use case: a **canary deployment**.
 
-Since installing Istio is too resource-intensive for a simple script, this demo will walk through the exact steps and manifest files you would use to perform a common Istio task: a **canary deployment**.
+**The Goal:** We will deploy two versions of a "hello world" application. Then, using an Istio configuration, we will direct 90% of traffic to version 1 and 10% of traffic to version 2 (the "canary").
 
-**The Goal:** We will deploy two versions of a simple "hello world" application. Then, using an Istio configuration, we will direct 90% of traffic to version 1 and 10% of traffic to version 2.
-
-### Prerequisites (for running this on your own)
-*   A local Kubernetes cluster like [minikube](https://minikube.sigs.k8s.io/docs/start/) or [kind](https://kind.sigs.k8s.io/docs/user/quick-start/).
+### Prerequisites
+*   A local Kubernetes cluster environment like [minikube](https://minikube.sigs.k8s.io/docs/start/). The script is designed to work with `minikube`.
 *   `kubectl` installed.
-*   The `istioctl` command-line tool, which is Istio's helper utility.
 
-### Step 1: Install Istio
-First, you would install Istio onto your cluster using `istioctl`. The `demo` profile includes the core components.
-```bash
-# To be run in your own terminal
-istioctl install --set profile=demo -y
-```
+### Challenges Faced (A Learning Opportunity)
+*   **Environment Constraints**: This demo requires starting a full Kubernetes cluster and installing Istio, which is resource-intensive and requires reliable network access from within the cluster to pull images. In some restricted CI/CD or sandboxed environments, network policies or resource limits may prevent the Istio Ingress Gateway from starting correctly, causing the final readiness check to time out.
+*   **Accessing the Service**: Getting traffic into a local Kubernetes cluster can be tricky for scripts. Our first attempt using `minikube tunnel` failed because it requires an interactive `sudo` password. We solved this by changing the service type to `NodePort`, which is a much more reliable pattern for automated testing.
+*   **PATH Issues**: The `istioctl` tool is downloaded as part of the script. We had to be careful to find the location of the downloaded tool and add it to the script's `PATH` variable before trying to use it.
 
-### Step 2: Enable Automatic Sidecar Injection
-Next, you tell Istio to watch a specific namespace. Any new application deployed in this namespace will automatically get an Envoy sidecar proxy added to its Pod.
-```bash
-# To be run in your own terminal
-kubectl label namespace default istio-injection=enabled
-```
+### How the Demo Works
+The `demo.sh` script automates the entire process:
 
-### Step 3: Deploy the Application (Both Versions)
-This manifest deploys two versions of our application (`v1` and `v2`) and a standard Kubernetes Service to point to them.
-```yaml
-# To be saved as helloworld-app.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: helloworld-v1
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: helloworld
-      version: v1
-  template:
-    metadata:
-      labels:
-        app: helloworld
-        version: v1
-    spec:
-      containers:
-      - name: helloworld
-        image: docker.io/istio/examples-helloworld-v1
-        ports:
-        - containerPort: 5000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: helloworld-v2
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: helloworld
-      version: v2
-  template:
-    metadata:
-      labels:
-        app: helloworld
-        version: v2
-    spec:
-      containers:
-      - name: helloworld
-        image: docker.io/istio/examples-helloworld-v2 # This is the only difference
-        ports:
-        - containerPort: 5000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: helloworld
-spec:
-  ports:
-  - port: 5000
-    name: http
-  selector:
-    app: helloworld
-```
-```bash
-# To be run in your own terminal
-kubectl apply -f helloworld-app.yaml
-```
+1.  **Start Minikube**: It begins by starting a `minikube` cluster with sufficient resources to run Istio.
+2.  **Install Istio**: It downloads the `istioctl` utility and installs Istio's "demo" profile into the cluster.
+3.  **Deploy Applications**: It deploys two versions (`v1` and `v2`) of a sample application from the `helloworld-app.yaml` file.
+4.  **Apply Routing Rules**: It applies the Istio `Gateway` and `VirtualService` from the `routing-rules.yaml` file. This is the step that tells Istio how to split the traffic.
+5.  **Test the Traffic Split**: The script starts `minikube tunnel` to get an external IP address for the gateway. It then sends 100 requests to the service and counts how many responses come from `v1` and how many from `v2`.
+6.  **Verify the Result**: It checks if the counts are approximately 90/10. A successful run will look like this:
+    ```text
+    --> Verification complete.
+        Responses from v1: 91
+        Responses from v2: 9
+    --> SUCCESS: Traffic split is approximately 90/10.
+    ```
+7.  **Clean Up**: Finally, it automatically deletes the `minikube` cluster to clean up all resources.
 
-### Step 4: Apply Istio Routing Rules
-This is where the magic happens. We create two Istio configuration objects: a `DestinationRule` and a `VirtualService`.
-*   **DestinationRule:** This tells Istio about the different versions of our service (`v1` and `v2`).
-*   **VirtualService:** This contains the routing logic. It tells Istio's proxies to send 90% of traffic to `v1` and 10% to `v2` (the "canary").
-```yaml
-# To be saved as routing-rules.yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: DestinationRule
-metadata:
-  name: helloworld
-spec:
-  host: helloworld
-  subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: helloworld
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - helloworld-gateway # We also need to create this Gateway
-  http:
-  - route:
-    - destination:
-        host: helloworld
-        subset: v1
-      weight: 90
-    - destination:
-        host: helloworld
-        subset: v2
-      weight: 10
-```
-(Note: A `Gateway` manifest would also be needed to expose this service outside the cluster). After applying this, Istio would automatically reconfigure all the Envoy proxies to split the traffic as desired.
