@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "name": "nginx"
+  },
+  "image": {
+    "image": "nginx:alpine"
+  },
+  "log_path": "nginx.log",
+  "linux": {
+  }
+}

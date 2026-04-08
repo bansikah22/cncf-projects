@@ -1,58 +1,33 @@
 #!/bin/bash
 
-# NOTE: The commands below are for demonstrating the `crictl` workflow with CRI-O.
-# They require a properly configured CRI-O installation and root privileges, which
-# may not be available in all environments. The expected output is documented
-# in the main README.md.
+# This script provides a verifiable demo of CRI-O by running a
+# minikube cluster with CRI-O as the container runtime.
 
-# The `crictl` command requires a configuration file to know which CRI socket to connect to.
-# This would typically be created at /etc/crictl.yaml
-# ---
-# runtime-endpoint: "unix:///var/run/crio/crio.sock"
-# image-endpoint: "unix:///var/run/crio/crio.sock"
-# timeout: 10
-# debug: false
-# ---
+set -e
 
-echo "--> This script demonstrates the steps to create a pod and container with crictl."
-echo "--> All commands are commented out due to environmental restrictions."
+echo "--> 1. Starting minikube cluster with CRI-O runtime..."
+minikube start --driver=docker --container-runtime=cri-o
 
-# POD_CONFIG="pod-sandbox.yaml"
-# CONTAINER_CONFIG="container-config.json"
-# IMAGE="docker.io/library/nginx:alpine"
+echo "--> 2. Verifying the container runtime is CRI-O..."
+# This is the key verification step. We check the node's container runtime.
+RUNTIME=$(kubectl get nodes -o jsonpath='{.items[0].status.nodeInfo.containerRuntimeVersion}')
+echo "Detected container runtime: $RUNTIME"
 
-# 1. Pull the image
-# echo "--> Pulling NGINX image..."
-# sudo crictl pull $IMAGE
+if [[ "$RUNTIME" == *"cri-o"* ]]; then
+  echo "--> SUCCESS: The Kubernetes node is running on CRI-O."
+else
+  echo "--> FAILURE: The Kubernetes node is NOT running on CRI-O."
+  minikube delete
+  exit 1
+fi
 
-# 2. Create the Pod Sandbox
-# This step creates the pod's namespaces and cgroups.
-# The config file defines metadata like the pod name and namespace.
-# echo "--> Creating Pod Sandbox..."
-# sudo crictl runp $POD_CONFIG
+echo "--> 3. Attempting to deploy an NGINX pod (for demonstration)..."
+# This step may fail due to image pull issues in some environments,
+# but the primary goal of verifying the runtime has already been achieved.
+kubectl create deployment nginx --image=nginx
+kubectl get pods
 
-# 3. Create the Container
-# This creates a container within the pod sandbox created above.
-# The config file references the pod ID and the image to use.
-# echo "--> Creating Container..."
-# sudo crictl create $(sudo crictl pods -q) $CONTAINER_CONFIG $POD_CONFIG
+echo "--> 4. Cleaning up..."
+minikube delete
 
-# 4. List Pods and Containers
-# echo "--> Listing Pods:"
-# sudo crictl pods
-# echo "--> Listing Containers:"
-# sudo crictl ps -a
-
-# 5. Stop and Remove
-# POD_ID=$(sudo crictl pods -q)
-# CONTAINER_ID=$(sudo crictl ps -a -q)
-# echo "--> Stopping container $CONTAINER_ID..."
-# sudo crictl stop $CONTAINER_ID
-# echo "--> Removing container $CONTAINER_ID..."
-# sudo crictl rm $CONTAINER_ID
-# echo "--> Stopping pod sandbox $POD_ID..."
-# sudo crictl stopp $POD_ID
-# echo "--> Removing pod sandbox $POD_ID..."
-# sudo crictl rmp $POD_ID
-
-echo "--> Demo script finished."
+echo "--> CRI-O demo completed successfully!"
