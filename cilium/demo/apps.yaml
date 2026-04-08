@@ -1,0 +1,67 @@
+# apps.yaml
+# Deploys two simple services, luke and leia
+apiVersion: v1
+kind: Service
+metadata:
+  name: leia
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: leia
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leia
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: leia
+  template:
+    metadata:
+      labels:
+        app: leia
+    spec:
+      containers:
+      - name: kubesrv
+        image: bansikah/kubesrv:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: luke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: luke
+  template:
+    metadata:
+      labels:
+        app: luke
+    spec:
+      containers:
+      - name: kubesrv
+        image: bansikah/kubesrv:latest
+        command: ["/kubesrv", "--text", "Hello from Luke"]
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
