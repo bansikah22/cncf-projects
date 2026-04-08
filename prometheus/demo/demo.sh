@@ -17,7 +17,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "--> 1. Setting up Docker network..."
-docker network create $NETWORK_NAME
+docker network create $NETWORK_NAME 2>/dev/null || true
 
 echo "--> 2. Building the custom web app image..."
 docker build -t my-web-app "$DEMO_DIR"

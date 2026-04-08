@@ -1,6 +1,5 @@
 from prometheus_client import start_http_server, Counter
 import http.server
-import time
 
 # Create a Prometheus metric to track the number of page views.
 PAGE_VIEWS = Counter('http_requests_total', 'Total number of HTTP requests received')
@@ -11,7 +10,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         PAGE_VIEWS.inc()
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"Hello, world! I've been viewed " + str(PAGE_VIEWS._value.get()).encode() + b" times.")
+        self.wfile.write(b"Hello, world!")
 
 if __name__ == '__main__':
     # Start up the server to expose the metrics.
