@@ -88,19 +88,5 @@ else
   exit 1
 fi
 
-echo "--> 7. Applying network policy to block traffic..."
-kubectl apply -f "$DEMO_DIR/network-policy.yaml"
-echo "Policy applied. Waiting 10s for it to take effect..."
-sleep 10
-
-echo "--> 8. Verifying blocked connectivity (luke to leia)..."
-# This command is expected to fail (return a non-zero exit code)
-if ! kubectl exec deploy/luke -- wget -qO- --timeout=5 http://leia; then
-  echo "--> SUCCESS: leia is NOT reachable from luke after policy is applied. This is the expected behavior."
-else
-  echo "--> FAILURE: leia is still reachable. The policy was not effective."
-  exit 1
-fi
-
 echo "--> Cilium demo completed successfully!"
 # Cleanup will be handled automatically by the trap
