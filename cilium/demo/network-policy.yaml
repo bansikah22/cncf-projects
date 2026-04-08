@@ -1,0 +1,16 @@
+# network-policy.yaml
+# This policy allows ingress traffic to pods with the label app=leia
+# only from pods that also have the label app=leia.
+
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "leia-ingress-policy"
+spec:
+  endpointSelector:
+    matchLabels:
+      app: leia
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app: leia
