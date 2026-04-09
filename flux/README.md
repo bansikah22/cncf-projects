@@ -6,8 +6,8 @@
 
 Flux and Argo CD are both very popular GitOps tools that solve the same fundamental problem. They have different origins and architectures, but their high-level goals are similar.
 
-*   **Architectural Style:** Flux is a collection of "micro-controllers." It breaks down the GitOps process into specialized controllers for different tasks (e.g., a `SourceController` for fetching from Git, a `KustomizeController` for applying Kustomize overlays, a `HelmController` for Helm charts). Argo CD is more of a monolithic tool with a central Application Controller.
-*   **User Interface:** Argo CD is widely known for its polished and powerful web UI. Flux is more controller-centric and is often managed via `kubectl` and command-line tools, though it does have UI options.
+*   **Architectural Style:** Flux is a collection of "micro-controllers." It breaks down the GitOps process into specialized controllers for different tasks (e.g., a `SourceController` for fetching from Git, a `KustomizeController` for applying Kustomize overlays). Argo CD is more of a monolithic tool with a central Application Controller.
+*   **User Interface:** Argo CD is widely known for its polished and powerful web UI. Flux is more controller-centric and is often managed via `kubectl` and command-line tools.
 
 ## How Flux Works
 
@@ -37,6 +37,8 @@ This demo will provide a robust, verifiable example of Flux's core functionality
 
 ### Manual Walkthrough
 
+This guide walks you through a GitOps workflow using Flux and the public GitHub repository [https://github.com/bansikah22/kubesrv-gitops](https://github.com/bansikah22/kubesrv-gitops).
+
 #### Step 1: Start Minikube & Install Flux
 This will start your local cluster and install the Flux CLI and the in-cluster components.
 
@@ -54,6 +56,8 @@ flux install
 
 #### Step 2: Connect Flux to Your Git Repository
 This is the core GitOps step. We will create a `GitRepository` source and a `Kustomization` to deploy the `kubesrv` app.
+
+**Prerequisite:** Before running the commands below, please ensure the `deployment.yaml` in your `kubesrv-gitops` repository (`apps/kubesrv/deployment.yaml`) is set to `replicas: 4`. This will allow you to observe the scale-down part of the demo later.
 
 ```bash
 # Create the GitRepository source
@@ -77,9 +81,13 @@ Flux will now automatically sync and deploy the application.
 # Watch the Kustomization until it is ready
 flux get kustomizations --watch
 
-# Verify that 4 replicas are running (as defined in the repo)
+# Verify that 4 replicas are running
 kubectl get pods
 ```
+
+You should see 4 pods running in your terminal.
+
+![4 Pods Running](images/4-pods.png)
 
 #### Step 4: The GitOps Loop - Scale Down
 Let's simulate a developer scaling the application down from 4 to 1.
@@ -90,7 +98,7 @@ Let's simulate a developer scaling the application down from 4 to 1.
     *   Commit and push this change to the `master` branch on GitHub.
 
 2.  **Observe the Change:**
-    *   Flux will automatically detect the change within the 1-minute interval. To speed it up, you can force a reconciliation:
+    *   Flux will automatically detect the change. To speed it up, you can force a reconciliation:
         ```bash
         flux reconcile kustomization kubesrv
         ```
@@ -100,11 +108,13 @@ Let's simulate a developer scaling the application down from 4 to 1.
         ```
 
 3.  **Verify the Result:**
-    *   Once the change is applied, verify the final state:
+    *   Once the change is applied, check the final pod count:
         ```bash
-        kubectl get deployment kubesrv -o jsonpath='{.spec.replicas}'
+        kubectl get pods
         ```
-    *   This command should now output `1`.
+    *   You should now see only 1 pod running.
+
+![1 Pod Running](images/1-pod.png)
 
 #### Step 5: Cleanup
 
