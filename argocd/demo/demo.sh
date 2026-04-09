@@ -18,8 +18,8 @@ cleanup() {
 trap cleanup EXIT
 cleanup
 
-echo "--> 1. Creating a minikube cluster..."
-minikube start --profile argocd-demo
+echo "--> 1. Creating a minikube cluster with increased resources..."
+minikube start --profile argocd-demo --cpus 4 --memory 8192
 
 echo "--> 2. Installing Argo CD..."
 kubectl create namespace argocd
