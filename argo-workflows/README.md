@@ -100,7 +100,7 @@ spec:
 Now, submit this workflow to your cluster:
 
 ```bash
-kubectl apply -f argo-workflows/demo/ci-workflow.yaml
+kubectl create -f argo-workflows/demo/ci-workflow.yaml
 ```
 
 #### Step 3: Observe in the UI
