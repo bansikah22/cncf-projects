@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: ci-pipeline-
+  namespace: argo # Ensure the workflow is created in the argo namespace
+spec:
+  entrypoint: ci-pipeline
+  templates:
+  - name: ci-pipeline
+    dag:
+      tasks:
+      - name: build
+        template: build-step
+      - name: test
+        dependencies: [build]
+        template: test-step
+
+  - name: build-step
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo 'Simulating build process...'; sleep 5; echo 'Compiled!'"]
+
+  - name: test-step
+    container:
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["echo 'Simulating test process...'; sleep 5; echo 'Tested!'"]
