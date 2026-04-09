@@ -42,7 +42,12 @@ kubectl wait --for=condition=ready pod/git-client
 kubectl cp "$DEMO_DIR/guestbook-gitops" git-client:/tmp/
 # Exec into the pod to configure git and push to gitea
 kubectl exec git-client -- /bin/sh -c "
-  apk add openssh-client
+  apk add openssh-client curl
+  # Wait for Gitea to be ready
+  until curl -s http://gitea.gitea.svc:3000; do
+    echo 'Waiting for Gitea...'
+    sleep 2
+  done
   git config --global user.email 'demo@example.com'
   git config --global user.name 'Demo User'
   cd /tmp/guestbook-gitops
