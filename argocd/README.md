@@ -165,6 +165,89 @@ kubectl get deployment -n guestbook guestbook-ui -o jsonpath='{.spec.replicas}'
 ```
 The final command should output `2`. This confirms Argo CD has correctly deployed the initial state from the Gitea repository.
 
+At this point, you can navigate to `https://localhost:8080` in your browser. You will get a certificate warning, which you can safely ignore for this demo. Log in with the username `admin` and the password you retrieved from the terminal. You will see the `guestbook` application card. Click on it to see the tree of all the Kubernetes resources that Argo CD has deployed and their status.
+
+### Step 8: The GitOps Loop - Simulate a Change
+Here we simulate a developer changing the desired state in Git. We will update the replica count from 2 to 3.
+
+```bash
+# Change the number of replicas in the patch file
+sed -i 's/replicas: 2/replicas: 3/' argocd/demo/guestbook-gitops/overlays/staging/patch.yaml
+
+# Create another temporary pod to push this change to Gitea
+kubectl run git-client --image=alpine/git --restart=Never --command -- sleep 3600
+kubectl wait --for=condition=ready pod/git-client
+kubectl cp argocd/demo/guestbook-gitops git-client:/tmp/
+kubectl exec git-client -- /bin/sh -c "
+  git config --global user.email 'demo@example.com' && git config --global user.name 'Demo User'
+  cd /tmp/guestbook-gitops && git add . && git commit -m 'Scale to 3 replicas' && git push
+"
+kubectl delete pod git-client
+
+# Tell Argo CD to check the Git repo for the change we just pushed
+argocd app refresh guestbook
+
+# Wait for Argo CD to see the change and re-sync the application
+argocd app wait guestbook --sync --health --timeout 300
+
+# Verify that Argo CD automatically applied the change to the cluster
+kubectl get deployment -n guestbook guestbook-ui -o jsonpath='{.spec.replicas}'
+```
+The final command should now output `3`. This proves the end-to-end GitOps workflow was successful!
+
+### Step 9: Cleanup
+When you are finished, stop the `kubectl port-forward` process (Ctrl+C) in the other terminal. Then, run these commands to delete the cluster and restore the local files you changed.
+
+```bash
+minikube delete --profile argocd-demo
+git checkout -- argocd/demo/application.yaml argocd/demo/guestbook-gitops/overlays/staging/patch.yaml
+```
+Now, open your web browser and navigate to `http://localhost:3001`. You will see the Gitea UI. You can explore the `gitea/guestbook` repository to see the Kubernetes manifests that our script just pushed.
+
+When you are finished, you can stop the port-forward process (Ctrl+C).
+
+
+### Step 6: Deploy the Application via Argo CD
+First, update the `application.yaml` to point to our new in-cluster Gitea repo, then apply it to the cluster.
+
+```bash
+# Update the repoURL to point to the internal Gitea service
+sed -i 's|https://github.com/bansikah22/cncf-projects.git|http://gitea.gitea.svc:3000/gitea/guestbook.git|' argocd/demo/application.yaml
+
+# Apply the application manifest to tell Argo CD what to deploy
+kubectl apply -f argocd/demo/application.yaml
+```
+
+### Step 7: Access Argo CD and Verify Sync
+Now, we will log in to Argo CD and verify that it has successfully synced our application.
+
+**First, open a new, separate terminal** and run this command. It will forward the Argo CD server UI and API to your local machine. **Leave this terminal running.**
+
+```bash
+kubectl -n argocd port-forward svc/argocd-server 8080:443
+```
+
+**Return to your original terminal** for the following commands.
+
+```bash
+# Get the auto-generated admin password
+ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+echo "Argo CD Admin Password: $ARGOCD_PASSWORD"
+
+# Login to Argo CD using the password
+argocd login localhost:8080 --username admin --password "\$ARGOCD_PASSWORD" --insecure
+
+# Wait for the application to sync and become healthy
+argocd app wait guestbook --sync --health --timeout 300
+
+# Verify the replica count is 2, as defined in our 'staging' overlay
+kubectl get deployment -n guestbook guestbook-ui -o jsonpath='{.spec.replicas}'
+```
+The final command should output `2`. This confirms Argo CD has correctly deployed the initial state from the Gitea repository.
+
+At this point, you can navigate to `https://localhost:8080` in your browser. You will get a certificate warning, which you can safely ignore for this demo. Log in with the username `admin` and the password you retrieved from the terminal. You will see the `guestbook` application card. Click on it to see the tree of all the Kubernetes resources that Argo CD has deployed and their status.
+
+
 ### Step 8: The GitOps Loop - Simulate a Change
 Here we simulate a developer changing the desired state in Git. We will update the replica count from 2 to 3.
 
