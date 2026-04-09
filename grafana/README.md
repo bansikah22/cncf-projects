@@ -4,15 +4,15 @@
 
 ## What is Grafana?
 
-While tools like Prometheus are excellent for collecting and storing metrics, they are not primarily designed for visualization. Grafana is the de-facto standard for creating beautiful, complex, and highly useful dashboards from a wide variety of data sources, including Prometheus.
+While tools like Prometheus are excellent for collecting and storing metrics, Grafana is the de-facto standard for creating beautiful, complex, and highly useful dashboards from a wide variety of data sources.
 
 ## How Grafana Works
 
 Grafana runs as a server that you can access through a web browser. Inside Grafana, you configure:
 
-1.  **Data Sources:** You tell Grafana how to connect to your databases (like Prometheus).
-2.  **Dashboards:** A collection of one or more panels.
-3.  **Panels:** A specific visualization (like a graph or a table) configured with a query.
+1.  **Data Sources:** Connections to your databases (like Prometheus).
+2.  **Dashboards:** Collections of panels.
+3.  **Panels:** Specific visualizations (like a graph or a table) configured with a query.
 
 ```mermaid
 graph TD
@@ -23,35 +23,27 @@ graph TD
 
 ## Verifiable Demo: Visualizing Prometheus Metrics
 
-This demo will show how to install Prometheus and Grafana into a single cluster and then use Grafana to visualize metrics collected by Prometheus.
+This demo will show how to install Prometheus and Grafana into a single cluster and then use Grafana to visualize metrics collected by Prometheus using a real-world community dashboard.
 
 ### Manual Walkthrough
 
-#### Step 1: Start Minikube
+#### Step 1: Cluster Setup (Minikube, Prometheus & Grafana)
+This single block of commands will create your local cluster and install all necessary components.
 
 ```bash
+# Start Minikube with its own profile
 minikube start --profile grafana-demo --cpus 4 --memory 8192
-```
 
-#### Step 2: Install Prometheus
-We will use the standard Helm chart to install a Prometheus instance.
-
-```bash
-# Add the Prometheus Helm repository
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-# Install Prometheus into a 'monitoring' namespace
+# Create a namespace for our monitoring tools
 kubectl create namespace monitoring
-helm install prometheus prometheus-community/prometheus --namespace monitoring
-```
 
-#### Step 3: Install Grafana
-
-```bash
-# Add the Grafana Helm repository
+# Add the Helm repositories
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
+
+# Install Prometheus
+helm install prometheus prometheus-community/prometheus --namespace monitoring
 
 # Install Grafana
 helm install grafana grafana/grafana \
@@ -60,39 +52,44 @@ helm install grafana grafana/grafana \
   --set adminPassword='admin'
 ```
 
-#### Step 4: Access the Grafana UI
+#### Step 2: Access the Grafana UI
 
-```bash
-# Port-forward the Grafana service. Open a new terminal for this and leave it running.
-kubectl -n monitoring port-forward svc/grafana 3000:80
+1.  **Port-forward the Grafana service.** We use local port `3001` to avoid conflicts.
+    *   **Open a new terminal for this and leave it running.**
+    ```bash
+    kubectl -n monitoring port-forward svc/grafana 3001:80
+    ```
 
-# Open your browser to http://localhost:3000
-# Log in with username 'admin' and password 'admin'.
-```
+2.  **Log in:**
+    *   Open your browser to `http://localhost:3001`.
+    *   Log in with **Username:** `admin` and **Password:** `admin`.
+    ![Grafana Login](images/grafana-login.png)
 
-#### Step 5: Add Prometheus as a Data Source
 
-1.  In the Grafana UI, go to the **Connections** section (the four squares icon on the left).
+#### Step 3: Add Prometheus as a Data Source
+
+1.  In the Grafana UI, go to the **Connections** section (the chain link icon on the left).
 2.  Click **Add new connection**.
 3.  Search for **Prometheus** and select it.
 4.  For the **Prometheus server URL**, enter the in-cluster address of the Prometheus server: `http://prometheus-server.monitoring.svc.cluster.local`.
+    ![Connect Prometheus](images/connect-prometheus-using-local-url.png)
 5.  Click **Save & test**. You should see a green checkmark indicating the data source is working.
 
-#### Step 6: Create a Dashboard
+#### Step 4: Import a Real-World Dashboard
+A common real-world scenario is to import pre-built dashboards from the Grafana community.
 
-1.  Click the **+** icon in the top-right corner and select **New Dashboard**.
-2.  Click **Add visualization**.
-3.  In the query editor at the bottom, make sure your **Prometheus** data source is selected.
-4.  In the query field, enter the following PromQL query to get the container CPU usage:
-    ```promql
-    sum(rate(container_cpu_usage_seconds_total{namespace="monitoring"}[5m])) by (pod)
-    ```
-5.  On the right side of the screen, under "Panel options," set the **Title** to "CPU Usage by Pod".
-6.  Click **Apply** in the top-right corner.
+1.  In the Grafana UI, navigate to the **Dashboards** section (the four squares icon on the left).
+2.  Click the **New** button in the top-right and select **Import**.
+3.  In the "Import via grafana.com" box, enter the ID `10856` and click **Load**.
+    ![Import Dashboard](images/import-dashboard-with-id.png)
+4.  On the next page, at the bottom, select your **Prometheus** data source from the dropdown.
+5.  Click **Import**.
 
-You will now see a panel on your dashboard showing the CPU usage of the pods in the `monitoring` namespace.
+You will now be taken to a complete, pre-built dashboard showing detailed metrics about your entire Minikube cluster.
 
-#### Step 7: Cleanup
+![Imported Dashboard](images/imported-dashboard.png)
+
+#### Step 5: Cleanup
 
 ```bash
 minikube delete --profile grafana-demo
