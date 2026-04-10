@@ -21,71 +21,60 @@ graph TD
 
 ## Verifiable Demo: Disallowing the 'latest' Image Tag
 
-This demo will provide a simple, verifiable example of a common Kyverno `validate` policy. We will create a policy that prevents pods from using images with the `:latest` tag, which is a common security best practice.
+This demo will provide a simple, verifiable example of a common Kyverno `validate` policy. We will create a policy that prevents pods from using images with the `:latest` tag.
 
 ### Manual Walkthrough
 
 #### Step 1: Start Minikube & Install Kyverno
+This will start a new cluster and install a specific, compatible version of Kyverno.
 
 ```bash
 # Start Minikube
 minikube start --profile kyverno-demo --cpus 4 --memory 8192
 
-# Install Kyverno using Helm
-helm repo add kyverno https://kyverno.github.io/kyverno/
-helm repo update
-helm install kyverno kyverno/kyverno --namespace kyverno --create-namespace
+# Install Kyverno v1.11.0 using the official release manifest
+kubectl create -f https://github.com/kyverno/kyverno/releases/download/v1.11.0/install.yaml
 
-# Wait a moment for the webhook to become active
-echo "Waiting for Kyverno webhook to be ready..."
-sleep 20
+# Wait for the main admission controller to be ready
+echo "--> Waiting for Kyverno Admission Controller..."
+kubectl wait --for=condition=ready pod -l app=kyverno -n kyverno --timeout=120s
+echo "--> Kyverno is ready."
 ```
 
-#### Step 2: Create the Policy
-Create the `kyverno/demo/disallow-latest-tag.yaml` file with the content below. This policy will be applied to all pods and has two rules: one to ensure an image tag is present, and another to ensure it is not `latest`.
+#### Step 2: Create a Test Namespace and Policy
+We will create a dedicated namespace for our test and apply the policy.
 
 ```bash
-kubectl apply -f kyverno/demo/disallow-latest-tag.yaml
-```
-
-#### Step 3: Create a Test Namespace
-By default, Kyverno is configured to ignore certain namespaces. To properly test our policy, we must create a new namespace that is not in the exclusion list.
-
-```bash
+# Create the test namespace
 kubectl create namespace test-ns
+
+# Apply the policy to disallow the 'latest' tag
+kubectl apply -f kyverno/demo/disallow-latest.yaml
 ```
 
-#### Step 4: Test the Policy (Non-Compliant Pod)
-Now, let's try to create a pod in our **test namespace** that violates the policy by using the `nginx:latest` image.
-
-```bash
-# Attempt to apply the pod with the 'latest' tag to the test namespace
-kubectl apply -f kyverno/demo/pod-with-latest-tag.yaml -n test-ns
-```
-The request should be **blocked** by Kyverno, and you will see an error message similar to this:
-```
-Error from server: error when creating "kyverno/demo/pod-with-latest-tag.yaml": admission webhook "validate.kyverno.svc-fail" denied the request:
-
-resource Pod/test-ns/pod-with-latest-tag was blocked due to the following policies
-
-disallow-latest-tag:
-  disallow-latest-tag: 'validation error: Using the ''latest'' tag on images is not allowed. rule disallow-latest-tag failed at path /spec/containers/0/image/'
-```
-This proves the policy is working as expected.
-
-#### Step 5: Test the Policy (Compliant Pod)
-For this test, we can use the `pod-with-label.yaml` file, as it uses `nginx` (which defaults to `nginx:latest` implicitly, but for the purpose of this test, we can imagine it is a compliant pod since it does not explicitly use the `latest` tag). A better compliant pod would specify a version, like `nginx:1.21.0`.
+#### Step 3: Test the Policy (Non-Compliant Deployment)
+Now, let's try to create a `Deployment` in our **test namespace** that violates the policy by using the `nginx:latest` image.
 
 ```bash
-# Attempt to apply a compliant pod to the test namespace
-kubectl apply -f kyverno/demo/pod-with-label.yaml -n test-ns
+# Attempt to apply the deployment with the 'latest' tag
+kubectl apply -f kyverno/demo/deployment.yaml -n test-ns
 ```
-This request should be **successful**:
-```
-pod/pod-with-label created
-```
+The request should be **blocked** by Kyverno, and you will see an error.
 
-#### Step 6: Cleanup
+#### Step 4: Test the Policy (Compliant Deployment)
+Now we will fix the deployment by changing the image tag from `latest` to a specific version (`1.21.0`) and apply it again.
+
+1.  **Update the Manifest:**
+    *   Open the file `kyverno/demo/deployment.yaml`.
+    *   Change the line `image: nginx:latest` to `image: nginx:1.21.0`.
+
+2.  **Apply the Compliant Deployment:**
+    ```bash
+    kubectl apply -f kyverno/demo/deployment.yaml -n test-ns
+    ```
+This request should now be **successful**.
+
+#### Step 5: Cleanup
 ```bash
 minikube delete --profile kyverno-demo
 ```
