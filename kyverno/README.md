@@ -60,6 +60,7 @@ Now, let's try to create a `Deployment` in our **test namespace** that violates 
 kubectl apply -f kyverno/demo/deployment.yaml -n test-ns
 ```
 The request should be **blocked** by Kyverno, and you will see an error.
+![Disallow latest](./images/latest-label-denieled.png)
 
 #### Step 4: Test the Policy (Compliant Deployment)
 Now we will fix the deployment by changing the image tag from `latest` to a specific version (`1.21.0`) and apply it again.
