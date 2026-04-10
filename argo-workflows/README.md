@@ -49,11 +49,10 @@ The `argo` command-line tool is the easiest way to interact with your workflows.
 # On Mac: brew install argo
 
 # On Linux:
-VERSION=v3.5.7
-curl -sLO https://github.com/argoproj/argo-workflows/releases/download/${VERSION}/argo-linux-amd64.gz
+curl -sLO https://github.com/argoproj/argo-workflows/releases/latest/download/argo-linux-amd64.gz
 gunzip argo-linux-amd64.gz
 chmod +x argo-linux-amd64
-sudo mv ./argo-linux-amd64 /usr/local/bin/argo
+sudo mv argo-linux-amd64 /usr/local/bin/argo
 ```
 
 #### Step 3: Submit the Official "Hello World" Example
@@ -95,7 +94,7 @@ You can see both completed workflows in the web UI.
 # Open a new terminal and run this command. Leave it running.
 kubectl -n argo port-forward svc/argo-server 2746:2746
 ```
-Open your browser to `http://localhost:2746`. You will see a list of the workflows you have run.
+Open your browser to `https://localhost:2746`. You will see a list of the workflows you have run.
 
 ![Hello World UI](images/helloworldworkflow-ui.png)
 
