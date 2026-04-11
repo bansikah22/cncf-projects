@@ -1,0 +1,10 @@
+apiVersion: operator.knative.dev/v1beta1
+kind: KnativeServing
+metadata:
+  name: knative-serving
+  namespace: knative-serving
+spec:
+  # A magic DNS provider for local testing
+  ingress:
+    istio:
+      enabled: true
