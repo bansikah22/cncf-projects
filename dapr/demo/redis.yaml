@@ -8,3 +8,7 @@ spec:
   metadata:
   - name: redisHost
     value: redis-master.default.svc.cluster.local:6379
+  - name: redisPassword
+    secretKeyRef:
+      name: redis
+      key: redis-password

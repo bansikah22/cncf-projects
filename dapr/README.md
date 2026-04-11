@@ -50,7 +50,9 @@ minikube start --profile dapr-demo --cpus 4 --memory 8192
 
 # Install the Dapr CLI (if you don't have it)
 # On Mac/Linux:
-wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
+wget https://raw.githubusercontent.com/dapr/cli/master/install/install.sh
+# Review the script for security, then run it:
+# bash install.sh
 ```
 
 #### Step 2: Initialize Dapr on Kubernetes
@@ -66,9 +68,14 @@ We will use Helm to deploy a simple Redis instance, which will act as our state 
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
-helm install redis bitnami/redis --set auth.enabled=false
+# We are setting a password and will store it in a Kubernetes secret.
+helm install redis bitnami/redis --set auth.enabled=true --set auth.password=dapr-secret
+
+# Create a Kubernetes secret to hold the Redis password for Dapr to use
+kubectl create secret generic redis --from-literal=redis-password=dapr-secret
 ```
-Now, create a Dapr `Component` manifest that tells Dapr how to connect to this Redis instance. Create a file named `dapr/demo/redis.yaml`:
+Now, create a Dapr `Component` manifest that tells Dapr how to connect to this Redis instance, including how to fetch the password from our new secret.
+ Create a file named `dapr/demo/redis.yaml`:
 
 ```yaml
 apiVersion: dapr.io/v1alpha1
@@ -113,7 +120,7 @@ spec:
     spec:
       containers:
       - name: python
-        image: dapriosamples/hello-k8s-python:latest
+        image: dapriosamples/hello-k8s-python:edge
 ```
 Apply it to the cluster:
 ```bash
