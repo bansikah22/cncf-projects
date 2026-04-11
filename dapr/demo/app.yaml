@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  labels:
+    app: python
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "python-app"
+        dapr.io/app-port: "5001"
+    spec:
+      containers:
+      - name: python
+        image: dapriosamples/hello-k8s-python:latest
