@@ -122,6 +122,7 @@ kubectl apply -f cert-manager/demo/my-app-certificate.yaml
     kubectl get secret my-app-tls
     ```
     The output should show a secret of type `kubernetes.io/tls`.
+    ![certificate](./images/terminal-output.png)
 
 3.  **Inspect the Certificate Contents (Optional):** You can decode the certificate from the secret to see its details, such as the issuer and the subject.
     ```bash
