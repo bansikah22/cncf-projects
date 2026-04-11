@@ -156,6 +156,7 @@ This document provides a curated list of **CNCF projects** with:
 ## 31. KubeVirt
 - 🔗 https://kubevirt.io
 - 🧪 Demo: Run a virtual machine inside Kubernetes
+## Tuf
 
 ---
 

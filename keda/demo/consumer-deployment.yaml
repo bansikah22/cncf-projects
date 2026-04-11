@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbitmq-conn
+type: Opaque
+data:
+  # The RabbitMQ URL is amqp://user:password@rabbitmq.default.svc.cluster.local:5672
+  # It must be base64 encoded
+  RabbitMqHost: YW1xcDovL3VzZXI6cGFzc3dvcmRAcmFiYml0bXEuZGVmYXVsdC5zdmMuY2x1c3Rlci5sb2NhbDo1Njcy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-consumer
+  labels:
+    app: rabbitmq-consumer
+spec:
+  replicas: 0 # Start with 0 replicas
+  selector:
+    matchLabels:
+      app: rabbitmq-consumer
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: ghcr.io/kedacore/tests-go-rabbitmq-consumer:latest
+          env:
+            - name: RABBITMQ_URL_AMQP
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-conn
+                  key: RabbitMqHost
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: rabbitmq-scaler
+spec:
+  scaleTargetRef:
+    name: rabbitmq-consumer
+  triggers:
+    - type: rabbitmq
+      metadata:
+        queueName: hello
+        hostFromEnv: RABBITMQ_URL_AMQP
+        mode: QueueLength
+        value: "5" # The threshold for scaling
