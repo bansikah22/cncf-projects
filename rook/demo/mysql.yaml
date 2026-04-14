@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: mysql-pv-claim
 spec:
-  storageClassName: rook-ceph-block
+  storageClassName: rook-ceph-block-test
   accessModes:
     - ReadWriteOnce
   resources:
