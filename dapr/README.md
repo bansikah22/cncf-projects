@@ -36,9 +36,9 @@ graph TD
     B -- "Handles complexity" --> E(Other Microservice);
 ```
 
-## Verifiable Demo: A Stateful Counter API
+## Verifiable Demo: A Stateful Order API
 
-This demo will provide a realistic example of using Dapr's state management building block. We will deploy a simple Python application that maintains a counter. The application itself will be stateless; it will use the Dapr sidecar to persist the counter's value in a Redis cache.
+This demo will provide a realistic example of using Dapr's state management building block. We will deploy a simple Node.js application that processes and stores orders. The application itself will be stateless; it will use the Dapr sidecar to persist the order data in a Redis cache.
 
 ### Manual Walkthrough
 
@@ -61,6 +61,8 @@ This command will deploy the core Dapr control plane components (`dapr-operator`
 ```bash
 dapr init --kubernetes
 ```
+You should see output confirming that the Dapr control plane has been installed successfully.
+![Dapr Init Output](./images/dapr-init.png)
 
 #### Step 3: Deploy Redis (Our State Store)
 We will use Helm to deploy a simple Redis instance, which will act as our state store.
@@ -88,43 +90,78 @@ spec:
   metadata:
   - name: redisHost
     value: redis-master.default.svc.cluster.local:6379
+  - name: redisPassword
+    secretKeyRef:
+      name: redis
+      key: redis-password
+  - name: actorStateStore
+    value: "true"
 ```
 Apply it to the cluster:
 ```bash
 kubectl apply -f dapr/demo/redis.yaml
 ```
 
-#### Step 4: Deploy the Python Application
-Create a file named `dapr/demo/app.yaml` with the following content. Note the `dapr.io/enabled: "true"` annotation, which tells the Dapr control plane to inject the `daprd` sidecar into this pod.
+#### Step 4: Deploy the Node.js Application & Service
+Create a file named `dapr/demo/app.yaml`. This defines the deployment for our Node.js application. Note the `dapr.io/enabled: "true"` annotation, which tells the Dapr control plane to inject the `daprd` sidecar into this pod.
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-app
+  name: nodeapp
   labels:
-    app: python
+    app: nodeapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: python
+      app: nodeapp
   template:
     metadata:
       labels:
-        app: python
+        app: nodeapp
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "python-app"
-        dapr.io/app-port: "5001"
+        dapr.io/app-id: "nodeapp"
+        dapr.io/app-port: "3000"
+        dapr.io/app-protocol: "http"
     spec:
       containers:
-      - name: python
-        image: dapriosamples/hello-k8s-python:edge
+        - name: app
+          image: dapriosamples/hello-k8s-node
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
 ```
-Apply it to the cluster:
+
+Next, create `dapr/demo/service.yaml` to expose the application within the cluster.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodeapp
+  labels:
+    app: nodeapp
+spec:
+  selector:
+    app: nodeapp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+```
+
+Apply all the manifests in the `demo` directory:
 ```bash
-kubectl apply -f dapr/demo/app.yaml
+kubectl apply -f dapr/demo/
 ```
 Wait for the deployment to be ready. You should see `2/2` in the `READY` column, indicating both the application container and the Dapr sidecar are running.
 ```bash
@@ -132,19 +169,22 @@ kubectl get pods -w
 ```
 
 #### Step 5: Test the State Management
-We will use `port-forward` to access the application and test the counter.
+We will use `port-forward` to access the Dapr sidecar of our application directly. This is a reliable way to interact with Dapr's API.
 
 ```bash
-# Open a new terminal for this and leave it running
-kubectl port-forward svc/python-app 5001:5001
-
-# In your original terminal, send a POST request to increment the counter
-curl -X POST http://localhost:5001/increment
-
-# Now, send a GET request to retrieve the current value
-curl http://localhost:5001/
+# Open a new terminal for this command and leave it running
+kubectl port-forward deployment/nodeapp 3500:3500
 ```
-The first time you run the GET request, it should return `"1"`. If you run the POST command again and then the GET command, it will return `"2"`. This proves that the state is being persisted in Redis, managed entirely by the Dapr sidecar.
+
+Now, in your original terminal, send a POST request to the `neworder` endpoint. The Dapr sidecar will receive this request and forward it to the `neworder` method on our Node.js application.
+
+```bash
+# Create a new order
+curl -X POST -H "Content-Type: application/json" -d '{"data": { "orderId": "42" }}' http://localhost:3500/v1.0/invoke/nodeapp/method/neworder
+```
+After sending the POST request, check the logs of the `app` container: `kubectl logs deployment/nodeapp -c app`. You should see a confirmation message like `Got a new order! Order ID: ...` followed by `Successfully persisted state...`. This proves that the application received the request via Dapr and used the Dapr state management API to persist the order in Redis.
+
+![Successful Order Log Output](./images/successful-order.png)
 
 #### Step 6: Cleanup
 ```bash

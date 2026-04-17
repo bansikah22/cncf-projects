@@ -1,30 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-app
+  name: nodeapp
   labels:
-    app: python
+    app: nodeapp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: python
+      app: nodeapp
   template:
     metadata:
       labels:
-        app: python
+        app: nodeapp
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "python-app"
-        dapr.io/app-port: "5001"
+        dapr.io/app-id: "nodeapp"
+        dapr.io/app-port: "3000"
+        dapr.io/app-protocol: "http"
     spec:
       containers:
-      - name: python
-        image: dapriosamples/hello-k8s-python:edge
-        resources:
-          limits:
-            cpu: "0.5"
-            memory: "128Mi"
-          requests:
-            cpu: "0.25"
-            memory: "64Mi"
+        - name: app
+          image: dapriosamples/hello-k8s-node
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "128Mi"
