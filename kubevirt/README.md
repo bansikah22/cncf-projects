@@ -40,6 +40,9 @@ graph TD
 
 ## Verifiable Demo: Running a VM on Kubernetes
 
+> **Demo Status: Unsuccessful**
+> The following demo could not be successfully run due to a persistent incompatibility between KubeVirt's `virt-handler` and the underlying host environment. The `virt-handler` pod consistently failed with a `CrashLoopBackOff` status, caused by an `inotify: too many open files` error. This issue persisted even after increasing the host's `inotify` limits and enabling KubeVirt's software emulation mode. The steps below are documented for completeness but could not be verified.
+
 This demo will walk through installing KubeVirt on Minikube and deploying a simple Fedora-based Virtual Machine Instance (VMI).
 
 ### Manual Walkthrough
