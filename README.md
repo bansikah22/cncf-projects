@@ -36,6 +36,6 @@ The following table summarizes the CNCF projects explored in this repository, th
 | **Harbor**| Successful | [`./harbor/`](./harbor/) | [goharbor.io](https://goharbor.io) |
 | **KubeVirt**| Unsuccessful | [`./kubevirt/`](./kubevirt/) | [kubevirt.io](https://kubevirt.io) |
 | **TUF**| Unsuccessful | [`./tuf/`](./tuf/) | [theupdateframework.io](https://theupdateframework.io) |
-| **Rook**| Unsuccessful | (No directory) | [rook.io](https://rook.io) |
-| **KEDA**| Unsuccessful | (No directory) | [keda.sh](https://keda.sh) |
+| **Rook**| Unsuccessful | [`./rook/`](./rook/) | [rook.io](https://rook.io) |
+| **KEDA**| Unsuccessful | [`./keda/`](./keda/) | [keda.sh](https://keda.sh) |
 | **Knative**| Successful | [`./knative/`](./knative/) | [knative.dev](https://knative.dev) |
