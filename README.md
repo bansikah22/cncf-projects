@@ -10,32 +10,32 @@ The following table summarizes the CNCF projects explored in this repository, th
 
 | Project | Demo Status | Project Directory | Official Website |
 | :--- | :--- | :--- | :--- |
-| **etcd** | ✅ Successful | [`./etcd/`](./etcd/) | [etcd.io](https://etcd.io) |
-| **CoreDNS** | ✅ Successful | [`./coredns/`](./coredns/) | [coredns.io](https://coredns.io) |
-| **containerd** | ✅ Successful | [`./containerd/`](./containerd/) | [containerd.io](https://containerd.io) |
-| **CRI-O** | ✅ Successful | [`./cri-o/`](./cri-o/) | [cri-o.io](https://cri-o.io) |
-| **Argo CD** | ✅ Successful | [`./argocd/`](./argocd/) | [argo-cd.readthedocs.io](https://argo-cd.readthedocs.io) |
-| **Argo Workflows** | ✅ Successful | [`./argo-workflows/`](./argo-workflows/) | [argoproj.github.io/workflows](https://argoproj.github.io/workflows/) |
-| **Flux** | ✅ Successful | [`./flux/`](./flux/) | [fluxcd.io](https://fluxcd.io) |
-| **Prometheus** | ✅ Successful | [`./prometheus/`](./prometheus/) | [prometheus.io](https://prometheus.io) |
-| **Jaeger** | ✅ Successful | [`./jaeger/`](./jaeger/) | [jaegertracing.io](https://www.jaegertracing.io) |
-| **OpenTelemetry** | ✅ Successful | [`./opentelemetry/`](./opentelemetry/) | [opentelemetry.io](https://opentelemetry.io) |
-| **Fluentd** | ✅ Successful | [`./fluentd/`](./fluentd/) | [fluentd.org](https://www.fluentd.org) |
-| **Envoy** | ✅ Successful | [`./envoy/`](./envoy/) | [envoyproxy.io](https://www.envoyproxy.io) |
-| **Istio** | ✅ Successful | [`./istio/`](./istio/) | [istio.io](https://istio.io) |
-| **Linkerd** | ✅ Successful | [`./linkerd/`](./linkerd/) | [linkerd.io](https://linkerd.io) |
-| **Cilium** | ✅ Successful | [`./cilium/`](./cilium/) | [cilium.io](https://cilium.io) |
-| **Open Policy Agent**| ✅ Successful | [`./opa/`](./opa/) | [openpolicyagent.org](https://www.openpolicyagent.org) |
-| **Kyverno**| ✅ Successful | [`./kyverno/`](./kyverno/) | [kyverno.io](https://kyverno.io) |
-| **Falco**| ✅ Successful | [`./falco/`](./falco/) | [falco.org](https://falco.org) |
-| **cert-manager**| ✅ Successful | [`./cert-manager/`](./cert-manager/) | [cert-manager.io](https://cert-manager.io) |
-| **SPIFFE**| ✅ Successful | [`./spiffe/`](./spiffe/) | [spiffe.io](https://spiffe.io) |
-| **SPIRE**| ✅ Successful | [`./spire/`](./spire/) | [spiffe.io/spire](https://spiffe.io/spire/) |
-| **Dapr**| ✅ Successful | [`./dapr/`](./dapr/) | [dapr.io](https://dapr.io) |
-| **Harbor**| ✅ Successful | [`./harbor/`](./harbor/) | [goharbor.io](https://goharbor.io) |
-| **KubeVirt**| ❌ Unsuccessful | [`./kubevirt/`](./kubevirt/) | [kubevirt.io](https://kubevirt.io) |
-| **TUF**| ❌ Unsuccessful | [`./tuf/`](./tuf/) | [theupdateframework.io](https://theupdateframework.io) |
-| **Rook**| ❌ Unsuccessful | (No directory) | [rook.io](https://rook.io) |
-| **KEDA**| ❌ Unsuccessful | (No directory) | [keda.sh](https://keda.sh) |
-| **Grafana**| 🟡 Not Started | (No directory) | [grafana.com](https://grafana.com) |
-| **Knative**| 🟡 Not Started | (No directory) | [knative.dev](https://knative.dev) |
+| **etcd** | Successful | [`./etcd/`](./etcd/) | [etcd.io](https://etcd.io) |
+| **CoreDNS** | Successful | [`./coredns/`](./coredns/) | [coredns.io](https://coredns.io) |
+| **containerd** | Successful | [`./containerd/`](./containerd/) | [containerd.io](https://containerd.io) |
+| **CRI-O** | Successful | [`./cri-o/`](./cri-o/) | [cri-o.io](https://cri-o.io) |
+| **Argo CD** | Successful | [`./argocd/`](./argocd/) | [argo-cd.readthedocs.io](https://argo-cd.readthedocs.io) |
+| **Argo Workflows** | Successful | [`./argo-workflows/`](./argo-workflows/) | [argoproj.github.io/workflows](https://argoproj.github.io/workflows/) |
+| **Flux** | Successful | [`./flux/`](./flux/) | [fluxcd.io](https://fluxcd.io) |
+| **Prometheus** | Successful | [`./prometheus/`](./prometheus/) | [prometheus.io](https://prometheus.io) |
+| **Grafana** | Successful | [`./grafana/`](./grafana/) | [grafana.com](https://grafana.com) |
+| **Jaeger** | Successful | [`./jaeger/`](./jaeger/) | [jaegertracing.io](https://www.jaegertracing.io) |
+| **OpenTelemetry** | Successful | [`./opentelemetry/`](./opentelemetry/) | [opentelemetry.io](https://opentelemetry.io) |
+| **Fluentd** | Successful | [`./fluentd/`](./fluentd/) | [fluentd.org](https://www.fluentd.org) |
+| **Envoy** | Successful | [`./envoy/`](./envoy/) | [envoyproxy.io](https://www.envoyproxy.io) |
+| **Istio** | Successful | [`./istio/`](./istio/) | [istio.io](https://istio.io) |
+| **Linkerd** | Successful | [`./linkerd/`](./linkerd/) | [linkerd.io](https://linkerd.io) |
+| **Cilium** | Successful | [`./cilium/`](./cilium/) | [cilium.io](https://cilium.io) |
+| **Open Policy Agent**| Successful | [`./opa/`](./opa/) | [openpolicyagent.org](https://www.openpolicyagent.org) |
+| **Kyverno**| Successful | [`./kyverno/`](./kyverno/) | [kyverno.io](https://kyverno.io) |
+| **Falco**| Successful | [`./falco/`](./falco/) | [falco.org](https://falco.org) |
+| **cert-manager**| Successful | [`./cert-manager/`](./cert-manager/) | [cert-manager.io](https://cert-manager.io) |
+| **SPIFFE**| Successful | [`./spiffe/`](./spiffe/) | [spiffe.io](https://spiffe.io) |
+| **SPIRE**| Successful | [`./spire/`](./spire/) | [spiffe.io/spire](https://spiffe.io/spire/) |
+| **Dapr**| Successful | [`./dapr/`](./dapr/) | [dapr.io](https://dapr.io) |
+| **Harbor**| Successful | [`./harbor/`](./harbor/) | [goharbor.io](https://goharbor.io) |
+| **KubeVirt**| Unsuccessful | [`./kubevirt/`](./kubevirt/) | [kubevirt.io](https://kubevirt.io) |
+| **TUF**| Unsuccessful | [`./tuf/`](./tuf/) | [theupdateframework.io](https://theupdateframework.io) |
+| **Rook**| Unsuccessful | (No directory) | [rook.io](https://rook.io) |
+| **KEDA**| Unsuccessful | (No directory) | [keda.sh](https://keda.sh) |
+| **Knative**| Not Started | (No directory) | [knative.dev](https://knative.dev) |
