@@ -29,7 +29,7 @@
 25. [x] Dapr
 26. Rook - demo not successful
 27. [x] Harbor
-28. KubeVirt
+28. KubeVirt - demo not successful
 
 ## Side Tools
 
