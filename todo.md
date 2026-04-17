@@ -30,6 +30,7 @@
 26. Rook - demo not successful
 27. [x] Harbor
 28. KubeVirt - demo not successful
+29. TUF - demo not successful
 
 ## Side Tools
 
