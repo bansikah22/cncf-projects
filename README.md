@@ -1,212 +1,41 @@
-# 🚀 CNCF Projects to Learn with Demos (Top 31)
+# CNCF Project Explorations
 
-This document provides a curated list of **CNCF projects** with:
-- 🌐 Official documentation links  
-- 🧪 Suggested hands-on demos  
-- 💼 Real-world relevance  
+This repository contains a series of hands-on explorations into various Cloud Native Computing Foundation (CNCF) projects. Each directory provides a verifiable, self-contained demonstration of a specific tool, complete with a detailed `README.md` that explains the tool's purpose, architecture, and the steps taken during the demo.
 
----
+The goal of this project is to provide practical, real-world examples of how these powerful cloud-native tools can be used.
 
-# 🧠 1. Core Kubernetes Ecosystem (MUST KNOW)
+## Explored Projects
 
-## 1. Kubernetes
-- 🔗 https://kubernetes.io
-- 🧪 Demo: Deploy a simple app (NGINX) with a Service and Ingress
+The following table summarizes the CNCF projects explored in this repository, the status of their hands-on demos, and links to their official websites.
 
-## 2. etcd
-- 🔗 https://etcd.io
-- 🧪 Demo: Store and retrieve key-value data using `etcdctl`
-
-## 3. CoreDNS
-- 🔗 https://coredns.io
-- 🧪 Demo: Customize DNS resolution inside a Kubernetes cluster
-
-## 4. containerd
-- 🔗 https://containerd.io
-- 🧪 Demo: Run a container using `ctr` CLI
-
-## 5. CRI-O
-- 🔗 https://cri-o.io
-- 🧪 Demo: Understand CRI by integrating CRI-O with Kubernetes
-
----
-
-# 📦 2. Packaging, Deployment & GitOps
-
-## 6. Helm
-- 🔗 https://helm.sh
-- 🧪 Demo: Package and deploy a Helm chart
-
-## 7. Kustomize
-- 🔗 https://kustomize.io
-- 🧪 Demo: Manage multiple environments (dev/prod)
-
-## 8. Argo CD
-- 🔗 https://argo-cd.readthedocs.io
-- 🧪 Demo: GitOps deployment from GitHub repo
-
-## 9. Argo Workflows
-- 🔗 https://argoproj.github.io/workflows/
-- 🧪 Demo: Run a simple CI pipeline in Kubernetes
-
-## 10. Flux
-- 🔗 https://fluxcd.io
-- 🧪 Demo: Sync a Git repo to Kubernetes cluster
-
----
-
-# 📊 3. Observability
-
-## 11. Prometheus
-- 🔗 https://prometheus.io
-- 🧪 Demo: Monitor Kubernetes metrics
-
-## 12. Grafana
-- 🔗 https://grafana.com
-- 🧪 Demo: Build dashboards for Prometheus metrics
-
-## 13. Jaeger
-- 🔗 https://www.jaegertracing.io
-- 🧪 Demo: Trace requests across microservices
-
-## 14. OpenTelemetry
-- 🔗 https://opentelemetry.io
-- 🧪 Demo: Instrument an app for tracing + metrics
-
-## 15. Fluentd
-- 🔗 https://www.fluentd.org
-- 🧪 Demo: Collect and forward logs
-
----
-
-# 🌐 4. Networking & Service Mesh
-
-## 16. Envoy
-- 🔗 https://www.envoyproxy.io
-- 🧪 Demo: Run Envoy as a reverse proxy
-
-## 17. Istio
-- 🔗 https://istio.io
-- 🧪 Demo: Traffic routing between services
-
-## 18. Linkerd
-- 🔗 https://linkerd.io
-- 🧪 Demo: Lightweight service mesh setup
-
-## 19. Cilium
-- 🔗 https://cilium.io
-- 🧪 Demo: Network policies using eBPF
-
----
-
-# 🔐 5. Security & Policy (DevSecOps)
-
-## 20. Open Policy Agent (OPA)
-- 🔗 https://www.openpolicyagent.org
-- 🧪 Demo: Write policy rules for Kubernetes
-
-## 21. Kyverno
-- 🔗 https://kyverno.io
-- 🧪 Demo: Enforce policies on resources
-
-## 22. Falco
-- 🔗 https://falco.org
-- 🧪 Demo: Detect runtime security threats
-
-## 23. cert-manager
-- 🔗 https://cert-manager.io
-- 🧪 Demo: Auto-generate TLS certificates
-
-## 24. SPIFFE
-- 🔗 https://spiffe.io
-- 🧪 Demo: Identity-based authentication
-
-## 25. SPIRE
-- 🔗 https://spiffe.io/spire/
-- 🧪 Demo: Workload identity management
-
----
-
-# 📡 6. Scaling, Serverless & Event-Driven
-
-## 26. KEDA
-- 🔗 https://keda.sh
-- 🧪 Demo: Auto-scale based on queue events
-
-## 27. Knative
-- 🔗 https://knative.dev
-- 🧪 Demo: Deploy serverless app
-
-## 28. Dapr
-- 🔗 https://dapr.io
-- 🧪 Demo: Build microservices with sidecars
-
----
-
-# 🗄️ 7. Storage, Registry & Virtualization
-
-## 29. Rook
-- 🔗 https://rook.io
-- 🧪 Demo: Deploy Ceph storage in Kubernetes
-
-## 30. Harbor
-- 🔗 https://goharbor.io
-- 🧪 Demo: Run a private container registry
-
-## 31. KubeVirt
-- 🔗 https://kubevirt.io
-- 🧪 Demo: Run a virtual machine inside Kubernetes
-## Tuf
-
----
-
-# 🧭 Suggested Learning Path
-
-## 🥇 Phase 1 (Start Here)
-- Kubernetes
-- Helm
-- Argo CD
-- Prometheus + Grafana
-
-## 🥈 Phase 2
-- Flux / Argo Workflows
-- OpenTelemetry
-- Cilium
-- cert-manager
-
-## 🥉 Phase 3 (Advanced)
-- Istio / Linkerd
-- OPA / Kyverno
-- SPIFFE / SPIRE
-- KEDA / Knative
-- KubeVirt (for hybrid environments)
-
----
-
-# 🎯 How to Use This List
-
-For each project:
-1. Read the official docs  
-2. Run the demo  
-3. Build a small project  
-4. Push to GitHub  
-
----
-
-# 🔥 Pro Tip
-
-Combine tools into real-world setups:
-
-- Kubernetes + Helm + ArgoCD (GitOps)
-- Prometheus + Grafana + OpenTelemetry (Observability)
-- Istio + OPA + cert-manager (Security)
-- KubeVirt + Kubernetes (Hybrid VM + Container workloads)
-
----
-
-# 📌 Goal
-
-Become confident in:
-- Cloud-native architecture  
-- Kubernetes ecosystem  
-- Real DevOps workflows  
+| Project | Demo Status | Project Directory | Official Website |
+| :--- | :--- | :--- | :--- |
+| **etcd** | ✅ Successful | [`./etcd/`](./etcd/) | [etcd.io](https://etcd.io) |
+| **CoreDNS** | ✅ Successful | [`./coredns/`](./coredns/) | [coredns.io](https://coredns.io) |
+| **containerd** | ✅ Successful | [`./containerd/`](./containerd/) | [containerd.io](https://containerd.io) |
+| **CRI-O** | ✅ Successful | [`./cri-o/`](./cri-o/) | [cri-o.io](https://cri-o.io) |
+| **Argo CD** | ✅ Successful | [`./argocd/`](./argocd/) | [argo-cd.readthedocs.io](https://argo-cd.readthedocs.io) |
+| **Argo Workflows** | ✅ Successful | [`./argo-workflows/`](./argo-workflows/) | [argoproj.github.io/workflows](https://argoproj.github.io/workflows/) |
+| **Flux** | ✅ Successful | [`./flux/`](./flux/) | [fluxcd.io](https://fluxcd.io) |
+| **Prometheus** | ✅ Successful | [`./prometheus/`](./prometheus/) | [prometheus.io](https://prometheus.io) |
+| **Jaeger** | ✅ Successful | [`./jaeger/`](./jaeger/) | [jaegertracing.io](https://www.jaegertracing.io) |
+| **OpenTelemetry** | ✅ Successful | [`./opentelemetry/`](./opentelemetry/) | [opentelemetry.io](https://opentelemetry.io) |
+| **Fluentd** | ✅ Successful | [`./fluentd/`](./fluentd/) | [fluentd.org](https://www.fluentd.org) |
+| **Envoy** | ✅ Successful | [`./envoy/`](./envoy/) | [envoyproxy.io](https://www.envoyproxy.io) |
+| **Istio** | ✅ Successful | [`./istio/`](./istio/) | [istio.io](https://istio.io) |
+| **Linkerd** | ✅ Successful | [`./linkerd/`](./linkerd/) | [linkerd.io](https://linkerd.io) |
+| **Cilium** | ✅ Successful | [`./cilium/`](./cilium/) | [cilium.io](https://cilium.io) |
+| **Open Policy Agent**| ✅ Successful | [`./opa/`](./opa/) | [openpolicyagent.org](https://www.openpolicyagent.org) |
+| **Kyverno**| ✅ Successful | [`./kyverno/`](./kyverno/) | [kyverno.io](https://kyverno.io) |
+| **Falco**| ✅ Successful | [`./falco/`](./falco/) | [falco.org](https://falco.org) |
+| **cert-manager**| ✅ Successful | [`./cert-manager/`](./cert-manager/) | [cert-manager.io](https://cert-manager.io) |
+| **SPIFFE**| ✅ Successful | [`./spiffe/`](./spiffe/) | [spiffe.io](https://spiffe.io) |
+| **SPIRE**| ✅ Successful | [`./spire/`](./spire/) | [spiffe.io/spire](https://spiffe.io/spire/) |
+| **Dapr**| ✅ Successful | [`./dapr/`](./dapr/) | [dapr.io](https://dapr.io) |
+| **Harbor**| ✅ Successful | [`./harbor/`](./harbor/) | [goharbor.io](https://goharbor.io) |
+| **KubeVirt**| ❌ Unsuccessful | [`./kubevirt/`](./kubevirt/) | [kubevirt.io](https://kubevirt.io) |
+| **TUF**| ❌ Unsuccessful | [`./tuf/`](./tuf/) | [theupdateframework.io](https://theupdateframework.io) |
+| **Rook**| ❌ Unsuccessful | (No directory) | [rook.io](https://rook.io) |
+| **KEDA**| ❌ Unsuccessful | (No directory) | [keda.sh](https://keda.sh) |
+| **Grafana**| 🟡 Not Started | (No directory) | [grafana.com](https://grafana.com) |
+| **Knative**| 🟡 Not Started | (No directory) | [knative.dev](https://knative.dev) |
