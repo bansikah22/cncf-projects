@@ -38,4 +38,4 @@ The following table summarizes the CNCF projects explored in this repository, th
 | **TUF**| Unsuccessful | [`./tuf/`](./tuf/) | [theupdateframework.io](https://theupdateframework.io) |
 | **Rook**| Unsuccessful | (No directory) | [rook.io](https://rook.io) |
 | **KEDA**| Unsuccessful | (No directory) | [keda.sh](https://keda.sh) |
-| **Knative**| Not Started | (No directory) | [knative.dev](https://knative.dev) |
+| **Knative**| Successful | [`./knative/`](./knative/) | [knative.dev](https://knative.dev) |
