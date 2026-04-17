@@ -88,23 +88,60 @@ helm install harbor harbor/harbor -f harbor/demo/values.yaml \
         ```bash
         kubectl get secret -n harbor harbor-core -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d
         ```
+    ![Harbor Login](./images/harbor-login.png)
 
 3.  **Create a Project:**
     *   Log in and go to **Projects**.
     *   Click **+ NEW PROJECT**.
     *   Enter `my-project` as the Project Name and click **OK**.
+    ![Create Project](./images/create-project-on-harbor-ui.png)
 
 #### Step 3: Push an Image to Harbor
 1.  **Configure Docker to trust the insecure registry:**
-    *   On Docker Desktop, go to Settings -> Docker Engine and add:
-        `"insecure-registries": ["$(minikube ip -p harbor-demo):30002"]`
-    *   On Linux, edit `/etc/docker/daemon.json` and add the same line, then restart Docker.
+    *   **Why?** By default, Docker requires a secure (HTTPS) connection to registries. Our local Harbor instance uses HTTP, so we must explicitly tell Docker to trust this specific, insecure address.
+    *   **On Docker Desktop:** Go to `Settings -> Docker Engine` and add the `insecure-registries` line to the JSON configuration.
+    *   **On Linux:** You must edit the Docker daemon's configuration file at `/etc/docker/daemon.json`. This requires root permissions (`sudo`).
+
+        > **Warning:** The Docker service will fail to start if this file contains invalid JSON. Be careful with commas and curly braces.
+
+        Open the file with a text editor, for example: `sudo nano /etc/docker/daemon.json`
+
+        *   **If the file is new or empty,** add the following content:
+            ```json
+            {
+              "insecure-registries": ["$(minikube ip -p harbor-demo):30002"]
+            }
+            ```
+        *   **If the file already has content,** add the new key and value, making sure to add a comma to the preceding line:
+            ```json
+            {
+              "some-other-config": "value",
+              "insecure-registregistries": ["$(minikube ip -p harbor-demo):30002"]
+            }
+            ```
+        After saving the file, restart the Docker service:
+        ```bash
+        sudo systemctl restart docker
+        ```
+
+        > **Troubleshooting: `Job for docker.service failed...`**
+        > If the `sudo systemctl restart docker` command fails, it is almost always because the `/etc/docker/daemon.json` file has a syntax error. Standard JSON does not support comments (`//` or `/* */`).
+        > **To Fix:**
+        > 1.  Re-edit the file: `sudo nano /etc/docker/daemon.json`
+        > 2.  Ensure it is 100% valid JSON. Remove any comments.
+        > 3.  Reload the systemd configuration and restart Docker:
+        >     ```bash
+        >     sudo systemctl daemon-reload
+        >     sudo systemctl restart docker
+        >     ```
+        > 4.  Verify it's running: `sudo systemctl status docker`
 
 2.  **Log in to Harbor from Docker:**
     ```bash
     # Use the password you retrieved in the previous step
     docker login $(minikube ip -p harbor-demo):30002 --username admin
     ```
+    ![Docker Login](./images/login-into-harbor-registry-using-docker.png)
 
 3.  **Pull, Tag, and Push an Image:**
     ```bash
@@ -112,6 +149,7 @@ helm install harbor harbor/harbor -f harbor/demo/values.yaml \
     docker tag alpine:3.18 $(minikube ip -p harbor-demo):30002/my-project/alpine:v1
     docker push $(minikube ip -p harbor-demo):30002/my-project/alpine:v1
     ```
+    ![Tag and Push Image](./images/tag-and-push-images-to-harbor.png)
 
 #### Step 4: Scan the Image for Vulnerabilities
 1.  Go back to the Harbor UI and navigate into `my-project`.
@@ -119,12 +157,14 @@ helm install harbor harbor/harbor -f harbor/demo/values.yaml \
 3.  You will see the `v1` tag. Harbor will automatically start a vulnerability scan.
 4.  After a minute, the "Vulnerabilities" column will be updated with a summary.
 5.  Click on the digest to see a detailed report of all CVEs found in the image.
+    ![Pushed Image in UI](./images/pushed-alpine-image-in-ui.png)
 
 #### Step 5: Pull and Run the Image from Kubernetes
 Now we will simulate a Kubernetes node pulling and running the image from the private registry.
 
 ```bash
 # First, create a secret so your Kubernetes cluster can authenticate with Harbor
+# Note: Ensure there are no spaces around the '=' for the --docker-password flag.
 kubectl create secret docker-registry regcred \
   --docker-server=$(minikube ip -p harbor-demo):30002 \
   --docker-username=admin \
@@ -149,6 +189,20 @@ EOF
 kubectl get pods my-app
 ```
 The pod starting successfully proves that Kubernetes was able to authenticate with your private Harbor registry and pull the image.
+
+> **Troubleshooting: `ErrImagePull` / `ImagePullBackOff`**
+> If the `my-app` pod fails to start with an `ErrImagePull` or `ImagePullBackOff` status, run `kubectl describe pod my-app`. If you see the error `http: server gave HTTP response to HTTPS client`, it means the Kubernetes node itself does not trust the insecure Harbor registry.
+> **The Fix:** You must configure the Docker daemon *inside the Minikube VM*. In some environments, system limitations (like `Too many open files`) can prevent this from succeeding even after a cluster restart. If the following commands fail, you may need to resolve underlying host system issues.
+> ```bash
+> # Create a temporary config file
+> echo '{"insecure-registries": ["'$(minikube ip -p harbor-demo)':30002"]}' > /tmp/daemon.json
+> # Copy it into the Minikube VM
+> minikube cp /tmp/daemon.json harbor-demo:/etc/docker/daemon.json -p harbor-demo
+> # Attempt to restart Docker inside the VM
+> minikube ssh -p harbor-demo -- 'sudo systemctl restart docker'
+> # Re-create the pod
+> kubectl delete pod my-app && kubectl apply -f <pod-manifest.yaml>
+> ```
 
 #### Step 6: Cleanup
 ```bash
