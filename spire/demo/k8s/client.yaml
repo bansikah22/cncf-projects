@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: client
+  labels:
+    app: client
+spec:
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+      - name: client
+        image: spire-client-app:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SPIFFE_ENDPOINT_SOCKET
+          value: "unix:///tmp/spire-agent/public/agent.sock"
+        volumeMounts:
+        - name: spire-agent-socket
+          mountPath: /tmp/spire-agent/public
+          readOnly: true
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+      restartPolicy: Never
+      volumes:
+      - name: spire-agent-socket
+        hostPath:
+          path: /run/spire/sockets
+          type: DirectoryOrCreate
+  backoffLimit: 4
+

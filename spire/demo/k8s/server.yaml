@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+  selector:
+    app: server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+    app: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+      - name: server
+        image: spire-server-app:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SPIFFE_ENDPOINT_SOCKET
+          value: "unix:///tmp/spire-agent/public/agent.sock"
+        ports:
+        - containerPort: 50051
+        volumeMounts:
+        - name: spire-agent-socket
+          mountPath: /tmp/spire-agent/public
+          readOnly: true
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+      volumes:
+      - name: spire-agent-socket
+        hostPath:
+          path: /run/spire/sockets
+          type: DirectoryOrCreate
