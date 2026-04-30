@@ -46,7 +46,7 @@ By controlling all the proxies from a central place, Istio can provide powerful 
 *   **Traffic Management:** You can easily implement advanced routing rules, like canary deployments (sending 10% of traffic to a new version), A/B testing, or automatic retries and circuit breakers.
 
 ## Verifiable Demo: A Canary Deployment
-This demo is a runnable script that uses `minikube` to showcase a real-world Istio use case: a **canary deployment**.
+This demo is a runnable script that uses `minikube` to showcase a real-world Istio use case: a **canary deployment** also you can visit [istio-net](https://github.com/bansikah22/istio-net) to see a little more complex implementation project concerning istio.
 
 **The Goal:** We will deploy two versions of a "hello world" application. Then, using an Istio configuration, we will direct 90% of traffic to version 1 and 10% of traffic to version 2 (the "canary").
 
