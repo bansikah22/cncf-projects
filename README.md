@@ -39,3 +39,8 @@ The following table summarizes the CNCF projects explored in this repository, th
 | **Rook**| Unsuccessful | [`./rook/`](./rook/) | [rook.io](https://rook.io) |
 | **KEDA**| Unsuccessful | [`./keda/`](./keda/) | [keda.sh](https://keda.sh) |
 | **Knative**| Successful | [`./knative/`](./knative/) | [knative.dev](https://knative.dev) |
+| **Crossplane**| Successful | [`./crossplane/`](./crossplane/) | [crossplane.io](https://crossplane.io) |
+
+## License
+
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
