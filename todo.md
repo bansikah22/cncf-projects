@@ -31,6 +31,7 @@
 27. [x] Harbor
 28. KubeVirt - demo not successful
 29. TUF - demo not successful
+30. [x] Crossplane
 
 ## Side Tools
 

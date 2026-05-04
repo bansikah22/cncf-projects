@@ -1,0 +1,13 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: podinfo-release
+spec:
+  forProvider:
+    chart:
+      name: podinfo
+      repository: https://stefanprodan.github.io/podinfo
+      version: 6.6.0
+    namespace: default
+  providerConfigRef:
+    name: default
