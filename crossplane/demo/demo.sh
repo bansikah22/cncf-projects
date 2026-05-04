@@ -9,7 +9,7 @@ echo "--> Cleaning up any stale resources..."
 # Delete the Crossplane release and deployment to ensure a fresh start
 kubectl delete release.helm.crossplane.io/podinfo-release -n default 2>/dev/null || true
 kubectl delete deployment/podinfo-release -n default 2>/dev/null || true
-kubectl delete pods --all -n default --force --grace-period=0 2>/dev/null || true
+kubectl delete pods --all -n default 2>/dev/null || true
 
 echo "--> Adding Crossplane Helm repository..."
 helm repo add crossplane-stable https://charts.crossplane.io/stable

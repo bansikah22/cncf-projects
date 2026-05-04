@@ -65,8 +65,8 @@ The `demo.sh` script automates the process:
 2. **Install Crossplane**: Uses Helm to install the core Crossplane components into the `crossplane-system` namespace.
 3. **Install Provider**: Installs `provider-helm`, which allows Crossplane to manage Helm charts as Kubernetes resources.
 4. **Configure Provider**: Applies necessary RBAC permissions (`ProviderConfig`) so the provider can create resources in the cluster.
-5. **Provision Infrastructure**: Creates a Crossplane `Release` resource (a managed resource) that tells the provider to deploy a simple Nginx Helm chart.
-6. **Verify Result**: Checks if the Crossplane `Release` becomes `READY` and `SYNCED`, and ensures the Nginx pods are running.
+5. **Provision Infrastructure**: Creates a Crossplane `Release` resource (a managed resource) that tells the provider to deploy the Podinfo Helm chart.
+6. **Verify Result**: Checks if the Crossplane `Release` becomes `READY` and `SYNCED`, and ensures the Podinfo pods are running.
 7. **Clean Up**: Deletes the `minikube` cluster.
 
 ### Running the Demo

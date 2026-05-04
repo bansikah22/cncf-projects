@@ -5,16 +5,37 @@ metadata:
   namespace: crossplane-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: provider-helm-limited-role
+rules:
+  # Permissions to manage resources in the default namespace for the demo
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets", "services", "pods", "namespaces"]
+    verbs: ["*"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["*"]
+  # Permissions to manage Crossplane's own Helm Release resources
+  - apiGroups: ["helm.crossplane.io"]
+    resources: ["releases", "providerconfigs"]
+    verbs: ["*"]
+  # Basic permissions for Crossplane package management
+  - apiGroups: ["pkg.crossplane.io"]
+    resources: ["deploymentruntimeconfigs"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: provider-helm-cluster-admin
+  name: provider-helm-limited-binding
 subjects:
   - kind: ServiceAccount
     name: provider-helm
     namespace: crossplane-system
 roleRef:
   kind: ClusterRole
-  name: cluster-admin
+  name: provider-helm-limited-role
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: pkg.crossplane.io/v1beta1
