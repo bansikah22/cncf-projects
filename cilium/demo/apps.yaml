@@ -1,4 +1,3 @@
-# apps.yaml
 # Deploys two simple services, luke and leia
 apiVersion: v1
 kind: Service
